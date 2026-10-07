@@ -1,0 +1,7 @@
+* text=auto
+*.lua text eol=crlf
+*.qplug text eol=crlf
+*.json text eol=crlf
+*.cmd text eol=crlf
+*.sh text eol=lf
+*.exe binary

@@ -1,0 +1,1 @@
+-- Single model; nothing to define.

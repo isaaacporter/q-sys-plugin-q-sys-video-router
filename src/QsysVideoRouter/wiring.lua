@@ -1,0 +1,1 @@
+-- No internal components, so no wiring.

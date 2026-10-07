@@ -1,0 +1,1 @@
+-- All pins are derived from Controls (UserPin); no extra pins required.
