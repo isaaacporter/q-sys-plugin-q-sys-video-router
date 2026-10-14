@@ -191,8 +191,6 @@
 		}
 
 		-- Current selection ----------------------------------------------------
-		-- Only the interlocked axis has a meaningful selection, so the other
-		-- readout stays empty; both are drawn so neither pin is hidden.
 		table.insert(graphics, {
 			Type = "GroupBox",
 			Text = SourceFirst and "Selection (source first)" or "Selection (destination first)",
@@ -200,24 +198,52 @@
 			Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
 			CornerRadius = 8, Position = {0, 134}, Size = {setupW, 58}
 		})
-		table.insert(graphics, {
-			Type = "Text", Text = "Source", FontSize = 10, HTextAlign = "Left",
-			Color = Palette.Gray, Position = {12, 156}, Size = {50, 14}
-		})
-		layout["selected_source_name"] = {
-			PrettyName = "Mode~Selected Source", Style = "Text", FontSize = fs,
-			HTextAlign = "Center", Color = Palette.White, Padding = 2, StrokeWidth = 1,
-			Position = {64, 154}, Size = {140, 24}
-		}
-		table.insert(graphics, {
-			Type = "Text", Text = "Destination", FontSize = 10, HTextAlign = "Left",
-			Color = Palette.Gray, Position = {216, 156}, Size = {70, 14}
-		})
-		layout["selected_dest_name"] = {
-			PrettyName = "Mode~Selected Destination", Style = "Text", FontSize = fs,
-			HTextAlign = "Center", Color = Palette.White, Padding = 2, StrokeWidth = 1,
-			Position = {288, 154}, Size = {setupW - 300, 24}
-		}
+		if SourceFirst then
+			-- Only the interlocked axis has a meaningful selection, so the
+			-- destination readout stays empty; both are drawn so neither pin is
+			-- hidden.
+			table.insert(graphics, {
+				Type = "Text", Text = "Source", FontSize = 10, HTextAlign = "Left",
+				Color = Palette.Gray, Position = {12, 156}, Size = {50, 14}
+			})
+			layout["selected_source_name"] = {
+				PrettyName = "Mode~Selected Source", Style = "Text", FontSize = fs,
+				HTextAlign = "Center", Color = Palette.White, Padding = 2, StrokeWidth = 1,
+				Position = {64, 154}, Size = {140, 24}
+			}
+			table.insert(graphics, {
+				Type = "Text", Text = "Destination", FontSize = 10, HTextAlign = "Left",
+				Color = Palette.Gray, Position = {216, 156}, Size = {70, 14}
+			})
+			layout["selected_dest_name"] = {
+				PrettyName = "Mode~Selected Destination", Style = "Text", FontSize = fs,
+				HTextAlign = "Center", Color = Palette.White, Padding = 2, StrokeWidth = 1,
+				Position = {288, 154}, Size = {setupW - 300, 24}
+			}
+		else
+			-- Destination first: the selected destination, then a ComboBox that
+			-- reads its routed source and routes a new one to it. Drawn in step
+			-- order. selected_source_name is never populated in this order, so
+			-- it stays pin-only.
+			table.insert(graphics, {
+				Type = "Text", Text = "Destination", FontSize = 10, HTextAlign = "Left",
+				Color = Palette.Gray, Position = {12, 156}, Size = {70, 14}
+			})
+			layout["selected_dest_name"] = {
+				PrettyName = "Mode~Selected Destination", Style = "Text", FontSize = fs,
+				HTextAlign = "Center", Color = Palette.White, Padding = 2, StrokeWidth = 1,
+				Position = {84, 154}, Size = {140, 24}
+			}
+			table.insert(graphics, {
+				Type = "Text", Text = "Source", FontSize = 10, HTextAlign = "Left",
+				Color = Palette.Gray, Position = {236, 156}, Size = {50, 14}
+			})
+			layout["selected_dest_source"] = {
+				PrettyName = "Mode~Selected Destination Source", Style = "ComboBox", FontSize = fs,
+				Color = Palette.White, Padding = 2, StrokeWidth = 1,
+				Position = {288, 154}, Size = {setupW - 300, 24}
+			}
+		end
 
 		-- Source setup ---------------------------------------------------------
 		-- A GroupBox title is drawn as a tab hanging down from the top border, so

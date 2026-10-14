@@ -2,38 +2,11 @@
 PluginInfo = {
 	Name = "Video~Q-SYS Video Router",
 	Description = "Source-first (or destination-first) matrix routing and one-to-all routing for a Router, Router with Mixer, or MediaCast Router component, with a selectable routed-source combo box per destination and per-source and per-destination visibility control.",
-	Version = "1.1.1.0",
-	BuildVersion = "1.1.1.0",
+	Version = "1.2.0.0",
+	BuildVersion = "1.2.0.0",
 	Id = "4310fd53-d142-4f99-b1be-6d17ed7fb85a",
 	Author = "CTI, Isaac Porter",
 }
-
---[[
-###############################################################################
-#
-# Q-SYS Video Router
-# Copyright 2026 Communication Technologies, Inc. (CTI)
-#
-# Front end for a Router / Router with Mixer / MediaCast Router component in
-# the design. Sources are on the left, destinations on the right. Two routing
-# modes:
-#
-#   One-To-One (Matrix) -- pick a source, then the destinations to send it to.
-#                          Source buttons are interlocked; every destination
-#                          already carrying the armed source highlights.
-#                          "Matrix Select Order" flips the two axes.
-#   One-To-All          -- pick a source; it is routed to every router output.
-#
-# Each destination also carries a routed-source ComboBox, which both reads the
-# route back and sets it.
-#
-# Per-source and per-destination visibility input pins hide entries that are
-# not physically connected.
-#
-# Based on the QSC, LLC. plugin framework.
-#
-###############################################################################
-]]
 
 -- Resources (palette, page list)
 -- CTI brand colour palette (see cti_brand_preferences.md)
@@ -251,6 +224,17 @@ function GetControls(props)
 			UserPin = true,
 			PinStyle = "Output"
 		})
+		-- Destination-first only: the source routed to the selected destination.
+		-- Laid out as a ComboBox, so it both reads that route back and sets it.
+		if props["Matrix Select Order"].Value == "Destination First" then
+			table.insert(ctrls, {
+				Name = "selected_dest_source",
+				ControlType = "Text",
+				Count = 1,
+				UserPin = true,
+				PinStyle = "Both"
+			})
+		end
 	
 		-- Destinations ---------------------------------------------------------------
 		for thisDest = 1, DestCount do
@@ -534,8 +518,6 @@ function GetControlLayout(props)
 			}
 	
 			-- Current selection ----------------------------------------------------
-			-- Only the interlocked axis has a meaningful selection, so the other
-			-- readout stays empty; both are drawn so neither pin is hidden.
 			table.insert(graphics, {
 				Type = "GroupBox",
 				Text = SourceFirst and "Selection (source first)" or "Selection (destination first)",
@@ -543,24 +525,52 @@ function GetControlLayout(props)
 				Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
 				CornerRadius = 8, Position = {0, 134}, Size = {setupW, 58}
 			})
-			table.insert(graphics, {
-				Type = "Text", Text = "Source", FontSize = 10, HTextAlign = "Left",
-				Color = Palette.Gray, Position = {12, 156}, Size = {50, 14}
-			})
-			layout["selected_source_name"] = {
-				PrettyName = "Mode~Selected Source", Style = "Text", FontSize = fs,
-				HTextAlign = "Center", Color = Palette.White, Padding = 2, StrokeWidth = 1,
-				Position = {64, 154}, Size = {140, 24}
-			}
-			table.insert(graphics, {
-				Type = "Text", Text = "Destination", FontSize = 10, HTextAlign = "Left",
-				Color = Palette.Gray, Position = {216, 156}, Size = {70, 14}
-			})
-			layout["selected_dest_name"] = {
-				PrettyName = "Mode~Selected Destination", Style = "Text", FontSize = fs,
-				HTextAlign = "Center", Color = Palette.White, Padding = 2, StrokeWidth = 1,
-				Position = {288, 154}, Size = {setupW - 300, 24}
-			}
+			if SourceFirst then
+				-- Only the interlocked axis has a meaningful selection, so the
+				-- destination readout stays empty; both are drawn so neither pin is
+				-- hidden.
+				table.insert(graphics, {
+					Type = "Text", Text = "Source", FontSize = 10, HTextAlign = "Left",
+					Color = Palette.Gray, Position = {12, 156}, Size = {50, 14}
+				})
+				layout["selected_source_name"] = {
+					PrettyName = "Mode~Selected Source", Style = "Text", FontSize = fs,
+					HTextAlign = "Center", Color = Palette.White, Padding = 2, StrokeWidth = 1,
+					Position = {64, 154}, Size = {140, 24}
+				}
+				table.insert(graphics, {
+					Type = "Text", Text = "Destination", FontSize = 10, HTextAlign = "Left",
+					Color = Palette.Gray, Position = {216, 156}, Size = {70, 14}
+				})
+				layout["selected_dest_name"] = {
+					PrettyName = "Mode~Selected Destination", Style = "Text", FontSize = fs,
+					HTextAlign = "Center", Color = Palette.White, Padding = 2, StrokeWidth = 1,
+					Position = {288, 154}, Size = {setupW - 300, 24}
+				}
+			else
+				-- Destination first: the selected destination, then a ComboBox that
+				-- reads its routed source and routes a new one to it. Drawn in step
+				-- order. selected_source_name is never populated in this order, so
+				-- it stays pin-only.
+				table.insert(graphics, {
+					Type = "Text", Text = "Destination", FontSize = 10, HTextAlign = "Left",
+					Color = Palette.Gray, Position = {12, 156}, Size = {70, 14}
+				})
+				layout["selected_dest_name"] = {
+					PrettyName = "Mode~Selected Destination", Style = "Text", FontSize = fs,
+					HTextAlign = "Center", Color = Palette.White, Padding = 2, StrokeWidth = 1,
+					Position = {84, 154}, Size = {140, 24}
+				}
+				table.insert(graphics, {
+					Type = "Text", Text = "Source", FontSize = 10, HTextAlign = "Left",
+					Color = Palette.Gray, Position = {236, 156}, Size = {50, 14}
+				})
+				layout["selected_dest_source"] = {
+					PrettyName = "Mode~Selected Destination Source", Style = "ComboBox", FontSize = fs,
+					Color = Palette.White, Padding = 2, StrokeWidth = 1,
+					Position = {288, 154}, Size = {setupW - 300, 24}
+				}
+			end
 	
 			-- Source setup ---------------------------------------------------------
 			-- A GroupBox title is drawn as a tab hanging down from the top border, so
@@ -816,6 +826,8 @@ if Controls then
 				local ctl = DestCtl("source", thisDest)
 				if ctl ~= nil then ctl.Choices = ChoiceList end
 			end
+			local selectedCtl = Controls["selected_dest_source"]
+			if selectedCtl ~= nil then selectedCtl.Choices = ChoiceList end
 			EndSuppress()
 		end
 	
@@ -943,16 +955,31 @@ if Controls then
 		-- The routed-source combo must read back a string from its own choice list,
 		-- so the label comes from this plugin's source names, not from whatever the
 		-- router calls the source.
+		local function RouteLabel(routed)
+			if routed == nil or routed < 1 then return "" end  -- unbound or unresolved
+			return ChoiceLabel[routed] or fmt("Source %d", routed)
+		end
+	
 		local function WriteRouteReadouts()
 			BeginSuppress()
 			for thisDest = 1, DestCount do
 				local routed = GetRoute(thisDest)
-				local label = ""              -- no router bound, or output unresolved
-				if routed ~= nil and routed >= 1 then
-					label = ChoiceLabel[routed] or fmt("Source %d", routed)
-				end
-				SetString(DestCtl("source", thisDest), label)
+				SetString(DestCtl("source", thisDest), RouteLabel(routed))
 				SetValue(DestCtl("route", thisDest), routed or 0)
+			end
+			-- Destination-first selection combo: the selected destination's route,
+			-- or in One-To-All (where it is locked out) the source every output
+			-- shares, matching what the source buttons light.
+			local selectedCtl = Controls["selected_dest_source"]
+			if selectedCtl ~= nil then
+				-- Not "a and b or c": CommonRoute() is nil when outputs differ.
+				local routed
+				if Mode == MODE_ALL then
+					routed = CommonRoute()
+				else
+					routed = GetRoute(SelectedDest)
+				end
+				SetString(selectedCtl, RouteLabel(routed))
 			end
 			EndSuppress()
 		end
@@ -990,6 +1017,7 @@ if Controls then
 				-- is locked out there just like the destination button.
 				SetFlag(DestCtl("source", thisDest), "IsDisabled", hidden or (Mode == MODE_ALL))
 			end
+			SetFlag(Controls["selected_dest_source"], "IsDisabled", Mode == MODE_ALL)
 			-- Never leave a selection parked on a hidden entry.
 			if not DestVisible(SelectedDest) then SelectedDest = FirstVisibleDest() end
 			if not SourceVisible(SelectedSource) then SelectedSource = FirstVisibleSource() end
@@ -1163,6 +1191,26 @@ if Controls then
 				end
 				Mode = MODE_ALL
 				ApplyMode()
+			end
+		end
+	
+		-- Destination-first selection combo. Picking a source routes the selected
+		-- destination to it -- the same action as pressing that source's button.
+		if Controls["selected_dest_source"] ~= nil then
+			Controls["selected_dest_source"].EventHandler = function(ctl)
+				if Suppressed() then return end
+				local wanted = ChoiceIndex[ctl.String or ""]
+				-- Same refusals as the per-destination combos: anything else is a
+				-- stale readout, not a request, and snaps back to the real route.
+				if wanted == nil
+					or Mode ~= MODE_MATRIX
+					or not DestVisible(SelectedDest)
+					or not SourceVisible(wanted) then
+					WriteRouteReadouts()
+					return
+				end
+				SetRoute(SelectedDest, wanted)
+				RefreshAll()
 			end
 		end
 	

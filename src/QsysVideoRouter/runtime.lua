@@ -158,6 +158,8 @@
 			local ctl = DestCtl("source", thisDest)
 			if ctl ~= nil then ctl.Choices = ChoiceList end
 		end
+		local selectedCtl = Controls["selected_dest_source"]
+		if selectedCtl ~= nil then selectedCtl.Choices = ChoiceList end
 		EndSuppress()
 	end
 
@@ -285,16 +287,31 @@
 	-- The routed-source combo must read back a string from its own choice list,
 	-- so the label comes from this plugin's source names, not from whatever the
 	-- router calls the source.
+	local function RouteLabel(routed)
+		if routed == nil or routed < 1 then return "" end  -- unbound or unresolved
+		return ChoiceLabel[routed] or fmt("Source %d", routed)
+	end
+
 	local function WriteRouteReadouts()
 		BeginSuppress()
 		for thisDest = 1, DestCount do
 			local routed = GetRoute(thisDest)
-			local label = ""              -- no router bound, or output unresolved
-			if routed ~= nil and routed >= 1 then
-				label = ChoiceLabel[routed] or fmt("Source %d", routed)
-			end
-			SetString(DestCtl("source", thisDest), label)
+			SetString(DestCtl("source", thisDest), RouteLabel(routed))
 			SetValue(DestCtl("route", thisDest), routed or 0)
+		end
+		-- Destination-first selection combo: the selected destination's route,
+		-- or in One-To-All (where it is locked out) the source every output
+		-- shares, matching what the source buttons light.
+		local selectedCtl = Controls["selected_dest_source"]
+		if selectedCtl ~= nil then
+			-- Not "a and b or c": CommonRoute() is nil when outputs differ.
+			local routed
+			if Mode == MODE_ALL then
+				routed = CommonRoute()
+			else
+				routed = GetRoute(SelectedDest)
+			end
+			SetString(selectedCtl, RouteLabel(routed))
 		end
 		EndSuppress()
 	end
@@ -332,6 +349,7 @@
 			-- is locked out there just like the destination button.
 			SetFlag(DestCtl("source", thisDest), "IsDisabled", hidden or (Mode == MODE_ALL))
 		end
+		SetFlag(Controls["selected_dest_source"], "IsDisabled", Mode == MODE_ALL)
 		-- Never leave a selection parked on a hidden entry.
 		if not DestVisible(SelectedDest) then SelectedDest = FirstVisibleDest() end
 		if not SourceVisible(SelectedSource) then SelectedSource = FirstVisibleSource() end
@@ -505,6 +523,26 @@
 			end
 			Mode = MODE_ALL
 			ApplyMode()
+		end
+	end
+
+	-- Destination-first selection combo. Picking a source routes the selected
+	-- destination to it -- the same action as pressing that source's button.
+	if Controls["selected_dest_source"] ~= nil then
+		Controls["selected_dest_source"].EventHandler = function(ctl)
+			if Suppressed() then return end
+			local wanted = ChoiceIndex[ctl.String or ""]
+			-- Same refusals as the per-destination combos: anything else is a
+			-- stale readout, not a request, and snaps back to the real route.
+			if wanted == nil
+				or Mode ~= MODE_MATRIX
+				or not DestVisible(SelectedDest)
+				or not SourceVisible(wanted) then
+				WriteRouteReadouts()
+				return
+			end
+			SetRoute(SelectedDest, wanted)
+			RefreshAll()
 		end
 	end
 

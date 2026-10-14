@@ -82,6 +82,17 @@
 		UserPin = true,
 		PinStyle = "Output"
 	})
+	-- Destination-first only: the source routed to the selected destination.
+	-- Laid out as a ComboBox, so it both reads that route back and sets it.
+	if props["Matrix Select Order"].Value == "Destination First" then
+		table.insert(ctrls, {
+			Name = "selected_dest_source",
+			ControlType = "Text",
+			Count = 1,
+			UserPin = true,
+			PinStyle = "Both"
+		})
+	end
 
 	-- Destinations ---------------------------------------------------------------
 	for thisDest = 1, DestCount do

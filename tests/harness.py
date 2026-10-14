@@ -7,6 +7,7 @@ green run means something. See qsys_preferences.md.
 """
 import sys
 import re
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from lupa import LuaRuntime
 
@@ -345,7 +346,72 @@ if SELECT_ORDER == "Destination First" then
 		C("selected_source_name").String == "",
 		"got '" .. tostring(C("selected_source_name").String) .. "'")
 
+	-- ===== selection combo: routes a source to the selected destination =====
+	-- Routes here: dest 1 <- 2, dest 3 <- 7, dest 4 unrouted.
+	local sel = "selected_dest_source"
+	local function SelOffered(label)
+		for _, ch in ipairs(C(sel).Choices or {}) do
+			if ch == label then return true end
+		end
+		return false
+	end
+
+	SelectDest(3)
+	check("S1 selection combo choices populated", #(C(sel).Choices or {}) == SRC_COUNT,
+		"#choices=" .. tostring(#(C(sel).Choices or {})))
+	check("S2 reads the selected destination's route", C(sel).String == "Source 7",
+		"got '" .. tostring(C(sel).String) .. "'")
+	SelectDest(1)
+	check("S3 follows a destination change", C(sel).String == "Source 2",
+		"got '" .. tostring(C(sel).String) .. "'")
+	SelectDest(4)
+	check("S4 unrouted destination reads blank", C(sel).String == "",
+		"got '" .. tostring(C(sel).String) .. "'")
+
+	SetCtl(sel, "String", "Source 6")
+	check("S5 pick routes the selected destination", math.floor(RouterSel(4).Value) == 6,
+		"select.4=" .. tostring(RouterSel(4).Value))
+	check("S6 other destinations untouched",
+		math.floor(RouterSel(1).Value) == 2 and math.floor(RouterSel(3).Value) == 7,
+		"select.1=" .. tostring(RouterSel(1).Value)
+			.. " select.3=" .. tostring(RouterSel(3).Value))
+	check("S7 source button follows the pick", LitSourceIx() == 6,
+		"lit=" .. tostring(LitSourceIx()))
+	check("S8 per-destination combo agrees", C("dest_source_004").String == "Source 6",
+		"got '" .. tostring(C("dest_source_004").String) .. "'")
+	check("S9 destination selection unchanged by a pick",
+		C("dest_select_004").Boolean and HighDestCount() == 1, "count=" .. HighDestCount())
+
+	SetCtl(sel, "String", "None")
+	check("S10 non-source string cannot clear a route", math.floor(RouterSel(4).Value) == 6,
+		"select.4=" .. tostring(RouterSel(4).Value))
+	check("S11 refused string snaps back", C(sel).String == "Source 6",
+		"got '" .. tostring(C(sel).String) .. "'")
+
+	SetRouterExternal(4, 8)
+	check("S12 follows an external route change", C(sel).String == "Source 8",
+		"got '" .. tostring(C(sel).String) .. "'")
+
+	SetCtl("source_visible_005", "Boolean", false)
+	check("S13 hidden source not offered", not SelOffered("Source 5"),
+		"'Source 5' still offered")
+	SetCtl(sel, "String", "Source 5")
+	check("S14 hidden source cannot be routed", math.floor(RouterSel(4).Value) == 8,
+		"select.4=" .. tostring(RouterSel(4).Value))
+	check("S15 rejected pick snaps back", C(sel).String == "Source 8",
+		"got '" .. tostring(C(sel).String) .. "'")
+	SetCtl("source_visible_005", "Boolean", true)
+
+	SetCtl("source_name_008", "String", "Roku")
+	check("S16 rename relabels the readout", C(sel).String == "Roku",
+		"got '" .. tostring(C(sel).String) .. "'")
+	check("S17 rename relabels the choice list", SelOffered("Roku"), "'Roku' not offered")
+	SetCtl("source_name_008", "String", "")
+
 else  -- Source First
+
+	check("S0 no selection combo in source-first", C("selected_dest_source") == nil,
+		"selected_dest_source exists")
 
 	check("T4 one source high at init", HighSourceCount() == 1,
 		"count=" .. HighSourceCount())
@@ -504,10 +570,30 @@ check("T25b combo refuses to route one output in one-to-all",
 check("T25c refused combo pick snaps back", C("dest_source_001").String == "Source 4",
 	"got '" .. tostring(C("dest_source_001").String) .. "'")
 
+if SELECT_ORDER == "Destination First" then
+	local sel = "selected_dest_source"
+	check("S20 selection combo disabled in one-to-all", C(sel).IsDisabled, "not disabled")
+	check("S21 selection combo shows the common source", C(sel).String == "Source 4",
+		"got '" .. tostring(C(sel).String) .. "'")
+	SetCtl(sel, "String", "Source 2")
+	local stillFour = true
+	for d = 1, DST_COUNT do
+		if math.floor(RouterSel(d).Value) ~= 4 then stillFour = false end
+	end
+	check("S22 selection combo refuses to route in one-to-all", stillFour,
+		"an output left source 4")
+	check("S23 refused pick snaps back", C(sel).String == "Source 4",
+		"got '" .. tostring(C(sel).String) .. "'")
+end
+
 -- break the common route: nothing should be lit
 SetRouterExternal(2, 6)
 check("T26 no lit source when routes differ", LitSourceIx() == nil,
 	"lit=" .. tostring(LitSourceIx()))
+if SELECT_ORDER == "Destination First" then
+	check("S24 no common source reads blank", C("selected_dest_source").String == "",
+		"got '" .. tostring(C("selected_dest_source").String) .. "'")
+end
 
 -- back to matrix
 Press("mode_matrix")
@@ -522,6 +608,10 @@ end
 check("T29 dest buttons re-enabled", not C("dest_select_001").IsDisabled, "still disabled")
 check("T29b routed-source combo re-enabled", not C("dest_source_001").IsDisabled,
 	"still disabled")
+if SELECT_ORDER == "Destination First" then
+	check("S25 selection combo re-enabled", not C("selected_dest_source").IsDisabled,
+		"still disabled")
+end
 
 -- visibility: sources
 SetCtl("source_visible_003", "Boolean", false)
@@ -612,6 +702,9 @@ LAYOUT_LUA = r"""
 -- Deliberately pin-only: the mode pair is set by Default Mode or driven by room
 -- logic, and has no home on either page.
 local PIN_ONLY = {mode_matrix = true, mode_all = true, mode_name = true}
+-- Destination first draws the selection combo in its place; it is never
+-- populated in that order.
+if SELECT_ORDER == "Destination First" then PIN_ONLY.selected_source_name = true end
 
 local out = {}
 for _, dims in ipairs({{1, 1}, {8, 4}, {64, 64}, {17, 33}}) do
@@ -813,7 +906,8 @@ def main():
         ),
         (
             "combo routes a single output in one-to-all",
-            sub(r'\s*or Mode ~= MODE_MATRIX', ''),
+            sub(r'or Mode ~= MODE_MATRIX\s*or not DestVisible\(thisDest\)',
+                'or not DestVisible(thisDest)'),
         ),
         (
             "combo offers hidden sources",
@@ -827,8 +921,8 @@ def main():
         ),
         (
             "routed-source readout ignores the choice labels",
-            sub(r'label = ChoiceLabel\[routed\] or fmt\("Source %d", routed\)',
-                'label = fmt("Source %d", routed)'),
+            sub(r'return ChoiceLabel\[routed\] or fmt\("Source %d", routed\)',
+                'return fmt("Source %d", routed)'),
         ),
         (
             "combo re-offers an unroute (source 0) choice",
@@ -840,31 +934,81 @@ def main():
             sub(r'if taken\[label\] then label = fmt\("%s \(%d\)", label, thisSource\) end',
                 ''),
         ),
+        # --- destination-first selection combo ---
+        (
+            "selection combo pick does not route",
+            sub(r'SetRoute\(SelectedDest, wanted\)', ''),
+        ),
+        (
+            "selection combo routes destination 1, not the selected one",
+            sub(r'SetRoute\(SelectedDest, wanted\)', 'SetRoute(1, wanted)'),
+        ),
+        (
+            "selection combo reads destination 1, not the selected one",
+            sub(r'routed = GetRoute\(SelectedDest\)', 'routed = GetRoute(1)'),
+        ),
+        (
+            "selection combo falls back to the selected route in one-to-all",
+            sub(r'routed = CommonRoute\(\)\s*else', 'routed = CommonRoute() or GetRoute(SelectedDest)\n\t\t\telse'),
+        ),
+        (
+            "selection combo routes in one-to-all",
+            sub(r'or Mode ~= MODE_MATRIX\s*or not DestVisible\(SelectedDest\)',
+                'or not DestVisible(SelectedDest)'),
+        ),
+        (
+            "selection combo offers no choices",
+            sub(r'if selectedCtl ~= nil then selectedCtl\.Choices = ChoiceList end', ''),
+        ),
+        (
+            "selection combo ignores source visibility",
+            sub(r'or not DestVisible\(SelectedDest\)\s*or not SourceVisible\(wanted\)',
+                'or not DestVisible(SelectedDest)'),
+        ),
+        (
+            "selection combo not locked out in one-to-all",
+            sub(r'SetFlag\(Controls\["selected_dest_source"\], "IsDisabled", Mode == MODE_ALL\)',
+                ''),
+        ),
     ]
 
-    mut_ok = 0
-    for name, patch in mutations:
-        mutated = patch(src)
-        if mutated == src:
-            print(f"  {name:52s} NOT APPLIED (pattern miss)")
-            continue
-        def sample_of(r):
-            return next((f for v in r.values() for f in v), "")
+    def sample_of(r):
+        return next((f for v in r.values() for f in v), "")
 
-        res = full_run(mutated, stop_early=True)
-        nfails = sum(len(v) for v in res.values())
-        if nfails > 0:
-            case = next((k for k, v in res.items() if v), "?")
-            parts = case.split("/")
-            where = f"{parts[0]}/{parts[2]}" if len(parts) > 2 else case
-            print(f"  {name:50s} caught in {where:22s} e.g. {sample_of(res)[:40]}",
-                  flush=True)
-            mut_ok += 1
-        else:
-            print(f"  {name:52s} *** SURVIVED -- harness blind spot ***", flush=True)
+    # Mutations are independent, so they run across cores. Workers get the
+    # already-mutated source because the patch lambdas cannot be pickled.
+    # Results are read back in list order, so output order is unchanged.
+    mut_ok = 0
+    with ProcessPoolExecutor() as pool:
+        pending = []
+        for name, patch in mutations:
+            mutated = patch(src)
+            fut = None if mutated == src else pool.submit(run_mutation, mutated)
+            pending.append((name, fut))
+
+        for name, fut in pending:
+            if fut is None:
+                print(f"  {name:52s} NOT APPLIED (pattern miss)", flush=True)
+                continue
+            res = fut.result()
+            nfails = sum(len(v) for v in res.values())
+            if nfails > 0:
+                case = next((k for k, v in res.items() if v), "?")
+                parts = case.split("/")
+                where = f"{parts[0]}/{parts[2]}" if len(parts) > 2 else case
+                print(f"  {name:50s} caught in {where:22s} e.g. {sample_of(res)[:40]}",
+                      flush=True)
+                mut_ok += 1
+            else:
+                print(f"  {name:52s} *** SURVIVED -- harness blind spot ***", flush=True)
 
     print(f"\n  mutations caught: {mut_ok}/{len(mutations)}")
     return 0 if total == 0 and mut_ok == len(mutations) else 1
+
+
+def run_mutation(mutated):
+    """Worker entry point: the full suite against one mutated source."""
+    return full_run(mutated, stop_early=True)
 
 
 if __name__ == "__main__":

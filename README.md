@@ -35,6 +35,16 @@ the surface reads as "where is this source going right now".
 Switching destinations re-highlights to show that destination's current source,
 so the surface always reads as "what is this output watching right now".
 
+On the **Setup** page, destination-first order also replaces the Selection
+row's source readout with a **Source ComboBox** (`selected_dest_source`), drawn
+after the selected destination so it reads in step order. It shows the source
+routed to the selected destination, and picking a source from it routes it
+there -- the same action as pressing that source's button. It follows the same
+rules as the per-destination combos below (visible sources only, no "None",
+locked out in One-To-All, refused picks snap back). In One-To-All it shows the
+source every output shares, or blank if they differ. The control only exists in
+destination-first order.
+
 **One-To-All** -- press a source and it is routed to **every** output on the
 router. A source lights only when *all* outputs sit on it; if any output differs
 (routed elsewhere in the design, say) nothing is lit, because no single source
@@ -133,7 +143,12 @@ Per source: `source_select_NNN`, `source_name_NNN`, `source_visible_NNN`.
 Global: `router_select`, `router_found`, `router_style`, `status`,
 `selected_dest_name`, `selected_source_name`, plus the pin-only `mode_matrix`,
 `mode_all` and `mode_name`. Only the interlocked axis populates its `selected_*`
-readout; the other stays empty.
+readout; the other stays empty. In destination-first order `selected_source_name`
+is pin-only (not drawn), since `selected_dest_source` takes its place.
+
+Destination-first only: `selected_dest_source` (source routed to the selected
+destination, **input and output** -- writing a valid choice string routes the
+selected destination).
 
 ## Feedback correctness
 
@@ -189,6 +204,12 @@ time a handler runs:
 - clearing a mode button flipped the mode back, latching both lit
 - the destination interlock thrashed (149,980 events on one control)
 
-The suite is mutation-tested: 22 mutations, all caught. Mutation testing earned
+The suite is mutation-tested: 30 mutations, all caught. Mutation testing earned
 its place here -- it exposed a blind spot where nothing asserted that a hidden
 source *goes dark* rather than merely turning invisible.
+
+The destination-first selection combo tests (`S*`) caught a Lua `a and b or c`
+trap on the way in: in One-To-All, `CommonRoute()` returns nil when outputs
+differ, which silently fell through to the selected destination's route. The
+readout now branches explicitly, and a mutation re-introduces the trap to keep
+it caught.
