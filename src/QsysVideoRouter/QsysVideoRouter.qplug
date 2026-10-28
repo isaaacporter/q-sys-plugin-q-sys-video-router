@@ -2,18 +2,18 @@
 PluginInfo = {
 	Name = "Video~Q-SYS Video Router",
 	Description = "Source-first (or destination-first) matrix routing and one-to-all routing for a Router, Router with Mixer, or MediaCast Router component, with a selectable routed-source combo box per destination and per-source and per-destination visibility control.",
-	Version = "1.2.0.0",
-	BuildVersion = "1.2.0.0",
+	Version = "1.2.1.0",
+	BuildVersion = "1.2.1.0",
 	Id = "4310fd53-d142-4f99-b1be-6d17ed7fb85a",
-	Author = "CTI, Isaac Porter",
+	Author = "Isaac Porter",
 }
 
 -- Resources (palette, page list)
--- CTI brand colour palette (see cti_brand_preferences.md)
+-- Colour palette
 Palette = {
-	cti_navy  = {13, 59, 102},   -- CTI Dark Blue  #0D3B66
-	cti_teal  = {0, 169, 165},   -- CTI Teal       #00A9A5
-	cti_amber = {255, 186, 73},  -- CTI Amber      #FFBA49
+	navy      = {13, 59, 102},   -- Dark Blue  #0D3B66
+	teal      = {0, 169, 165},   -- Teal       #00A9A5
+	amber     = {255, 186, 73},  -- Amber      #FFBA49
 	White     = {255, 255, 255},
 	Black     = {0, 0, 0},
 	Gray      = {128, 128, 128},
@@ -44,7 +44,7 @@ Geometry = {
 
 -- Define the colour of the plugin object in the design
 function GetColor(props)
-	return Palette.cti_navy
+	return Palette.navy
 end
 
 -- The name that initially displays when dragged into a design
@@ -374,7 +374,7 @@ function GetControlLayout(props)
 		local function TitleBlock(width)
 			table.insert(graphics, {
 				Type = "Text", Text = "Q-SYS Video Router", FontSize = 16,
-				FontStyle = "Bold", HTextAlign = "Left", Color = Palette.cti_navy,
+				FontStyle = "Bold", HTextAlign = "Left", Color = Palette.navy,
 				Position = {0, 4}, Size = {320, 24}
 			})
 			table.insert(graphics, {
@@ -395,7 +395,7 @@ function GetControlLayout(props)
 				Type = "GroupBox",
 				Text = SourceFirst and "Sources (1. select)" or "Sources (2. route)",
 				FontSize = fs, HTextAlign = "Left",
-				Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+				Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 				CornerRadius = 8, Position = {srcGX, srcGY}, Size = {srcGW, srcGH}
 			})
 			for thisSource = 1, SourceCount do
@@ -403,7 +403,7 @@ function GetControlLayout(props)
 				layout[fmt("source_select_%03d", thisSource)] = {
 					PrettyName = fmt("Sources~%d Select", thisSource),
 					Legend = tostring(thisSource), FontSize = fs, Style = "Button",
-					Color = Palette.green_on, OffColor = Palette.cti_navy, UnlinkOffColor = true,
+					Color = Palette.green_on, OffColor = Palette.navy, UnlinkOffColor = true,
 					Margin = 3, Position = {cellX, cellY}, Size = {btnW, btnH}
 				}
 				layout[fmt("source_name_%03d", thisSource)] = {
@@ -419,7 +419,7 @@ function GetControlLayout(props)
 				Type = "GroupBox",
 				Text = SourceFirst and "Destinations (2. route to)" or "Destinations (1. select)",
 				FontSize = fs, HTextAlign = "Left",
-				Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+				Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 				CornerRadius = 8, Position = {destGX, destGY}, Size = {destGW, destGH}
 			})
 			for thisCol = 0, destCols - 1 do
@@ -436,7 +436,7 @@ function GetControlLayout(props)
 				layout[fmt("dest_select_%03d", thisDest)] = {
 					PrettyName = fmt("Destinations~%d Select", thisDest),
 					Legend = tostring(thisDest), FontSize = fs, Style = "Button",
-					Color = Palette.cti_amber, OffColor = Palette.cti_navy, UnlinkOffColor = true,
+					Color = Palette.amber, OffColor = Palette.navy, UnlinkOffColor = true,
 					Margin = 3, Position = {cellX, cellY}, Size = {btnW, btnH}
 				}
 				layout[fmt("dest_name_%03d", thisDest)] = {
@@ -457,7 +457,7 @@ function GetControlLayout(props)
 			-- Footer: bound router and status --------------------------------------
 			table.insert(graphics, {
 				Type = "GroupBox", Text = "Router", FontSize = fs, HTextAlign = "Left",
-				Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+				Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 				CornerRadius = 8, Position = {0, footY}, Size = {totalW, 58}
 			})
 			layout["status"] = {
@@ -467,7 +467,7 @@ function GetControlLayout(props)
 			}
 			table.insert(graphics, {
 				Type = "Text", Text = "Naming", FontSize = fs, HTextAlign = "Right",
-				Color = Palette.cti_navy, Position = {totalW - 202, footY + 25}, Size = {56, labelH}
+				Color = Palette.navy, Position = {totalW - 202, footY + 25}, Size = {56, labelH}
 			})
 			layout["router_style"] = {
 				PrettyName = "Router~Control Naming", Style = "Text", FontSize = fs,
@@ -489,12 +489,12 @@ function GetControlLayout(props)
 			-- Router binding -------------------------------------------------------
 			table.insert(graphics, {
 				Type = "GroupBox", Text = "Router Component", FontSize = fs, HTextAlign = "Left",
-				Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+				Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 				CornerRadius = 8, Position = {0, 34}, Size = {setupW, 92}
 			})
 			table.insert(graphics, {
 				Type = "Text", Text = "Router", FontSize = fs, HTextAlign = "Left",
-				Color = Palette.cti_navy, Position = {12, 59}, Size = {50, labelH}
+				Color = Palette.navy, Position = {12, 59}, Size = {50, labelH}
 			})
 			layout["router_select"] = {
 				PrettyName = "Router~Component", Style = "ComboBox", FontSize = fs,
@@ -522,7 +522,7 @@ function GetControlLayout(props)
 				Type = "GroupBox",
 				Text = SourceFirst and "Selection (source first)" or "Selection (destination first)",
 				FontSize = fs, HTextAlign = "Left",
-				Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+				Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 				CornerRadius = 8, Position = {0, 134}, Size = {setupW, 58}
 			})
 			if SourceFirst then
@@ -582,7 +582,7 @@ function GetControlLayout(props)
 			local sSetupH = rowDY + SourceCount * rowH + 10
 			table.insert(graphics, {
 				Type = "GroupBox", Text = "Sources", FontSize = fs, HTextAlign = "Left",
-				Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+				Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 				CornerRadius = 8, Position = {0, sSetupY}, Size = {setupW, sSetupH}
 			})
 			table.insert(graphics, {
@@ -597,7 +597,7 @@ function GetControlLayout(props)
 				local rowY = sSetupY + rowDY + (thisSource - 1) * rowH
 				table.insert(graphics, {
 					Type = "Text", Text = tostring(thisSource), FontSize = fs, HTextAlign = "Right",
-					Color = Palette.cti_navy, Position = {8, rowY + 3}, Size = {28, labelH}
+					Color = Palette.navy, Position = {8, rowY + 3}, Size = {28, labelH}
 				})
 				layout[fmt("source_name_%03d", thisSource)] = {
 					PrettyName = fmt("Sources~%d Name", thisSource),
@@ -618,7 +618,7 @@ function GetControlLayout(props)
 			local dSetupH = rowDY + DestCount * rowH + 10
 			table.insert(graphics, {
 				Type = "GroupBox", Text = "Destinations", FontSize = fs, HTextAlign = "Left",
-				Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+				Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 				CornerRadius = 8, Position = {0, dSetupY}, Size = {setupW, dSetupH}
 			})
 			table.insert(graphics, {
@@ -637,7 +637,7 @@ function GetControlLayout(props)
 				local rowY = dSetupY + rowDY + (thisDest - 1) * rowH
 				table.insert(graphics, {
 					Type = "Text", Text = tostring(thisDest), FontSize = fs, HTextAlign = "Right",
-					Color = Palette.cti_navy, Position = {8, rowY + 3}, Size = {28, labelH}
+					Color = Palette.navy, Position = {8, rowY + 3}, Size = {28, labelH}
 				})
 				layout[fmt("dest_name_%03d", thisDest)] = {
 					PrettyName = fmt("Destinations~%d Name", thisDest),

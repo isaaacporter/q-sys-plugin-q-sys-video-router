@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Template for the Q-SYS Personal Package. build_package.ps1 fills the
+  $token$ values and packs it; do not pack this file directly.
+-->
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>Q-SYS Video Router</title>
+    <authors>Isaac Porter</authors>
+    <owners>Isaac Porter</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <icon>content\icon.png</icon>
+    <iconUrl>$iconUrl$</iconUrl>
+    <projectUrl>$projectUrl$</projectUrl>
+    <description>An operator front end for a Router, Router with Mixer, or MediaCast Router component in a Q-SYS design. Sources on the left, destinations on the right: pick a source, then the destinations to send it to, or route one source to every output. Names, per-entry visibility, and a routed-source readout for each destination. Installation via this personal package requires Q-SYS Designer 10.1 or later. Plugin version: $pluginVersion$.</description>
+    <summary>Source-to-destination routing panel for any Q-SYS router component.</summary>
+    <releaseNotes>$releaseNotes$</releaseNotes>
+    <copyright>2026 Isaac Porter</copyright>
+    <tags>Video Router Matrix</tags>
+  </metadata>
+  <files>
+    <file src="$qplug$" target="content" />
+    <file src="$icon$" target="content" />
+  </files>
+</package>

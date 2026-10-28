@@ -6,7 +6,7 @@
 
 -- Define the colour of the plugin object in the design
 function GetColor(props)
-	return Palette.cti_navy
+	return Palette.navy
 end
 
 -- The name that initially displays when dragged into a design

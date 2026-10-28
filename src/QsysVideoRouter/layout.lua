@@ -47,7 +47,7 @@
 	local function TitleBlock(width)
 		table.insert(graphics, {
 			Type = "Text", Text = "Q-SYS Video Router", FontSize = 16,
-			FontStyle = "Bold", HTextAlign = "Left", Color = Palette.cti_navy,
+			FontStyle = "Bold", HTextAlign = "Left", Color = Palette.navy,
 			Position = {0, 4}, Size = {320, 24}
 		})
 		table.insert(graphics, {
@@ -68,7 +68,7 @@
 			Type = "GroupBox",
 			Text = SourceFirst and "Sources (1. select)" or "Sources (2. route)",
 			FontSize = fs, HTextAlign = "Left",
-			Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+			Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 			CornerRadius = 8, Position = {srcGX, srcGY}, Size = {srcGW, srcGH}
 		})
 		for thisSource = 1, SourceCount do
@@ -76,7 +76,7 @@
 			layout[fmt("source_select_%03d", thisSource)] = {
 				PrettyName = fmt("Sources~%d Select", thisSource),
 				Legend = tostring(thisSource), FontSize = fs, Style = "Button",
-				Color = Palette.green_on, OffColor = Palette.cti_navy, UnlinkOffColor = true,
+				Color = Palette.green_on, OffColor = Palette.navy, UnlinkOffColor = true,
 				Margin = 3, Position = {cellX, cellY}, Size = {btnW, btnH}
 			}
 			layout[fmt("source_name_%03d", thisSource)] = {
@@ -92,7 +92,7 @@
 			Type = "GroupBox",
 			Text = SourceFirst and "Destinations (2. route to)" or "Destinations (1. select)",
 			FontSize = fs, HTextAlign = "Left",
-			Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+			Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 			CornerRadius = 8, Position = {destGX, destGY}, Size = {destGW, destGH}
 		})
 		for thisCol = 0, destCols - 1 do
@@ -109,7 +109,7 @@
 			layout[fmt("dest_select_%03d", thisDest)] = {
 				PrettyName = fmt("Destinations~%d Select", thisDest),
 				Legend = tostring(thisDest), FontSize = fs, Style = "Button",
-				Color = Palette.cti_amber, OffColor = Palette.cti_navy, UnlinkOffColor = true,
+				Color = Palette.amber, OffColor = Palette.navy, UnlinkOffColor = true,
 				Margin = 3, Position = {cellX, cellY}, Size = {btnW, btnH}
 			}
 			layout[fmt("dest_name_%03d", thisDest)] = {
@@ -130,7 +130,7 @@
 		-- Footer: bound router and status --------------------------------------
 		table.insert(graphics, {
 			Type = "GroupBox", Text = "Router", FontSize = fs, HTextAlign = "Left",
-			Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+			Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 			CornerRadius = 8, Position = {0, footY}, Size = {totalW, 58}
 		})
 		layout["status"] = {
@@ -140,7 +140,7 @@
 		}
 		table.insert(graphics, {
 			Type = "Text", Text = "Naming", FontSize = fs, HTextAlign = "Right",
-			Color = Palette.cti_navy, Position = {totalW - 202, footY + 25}, Size = {56, labelH}
+			Color = Palette.navy, Position = {totalW - 202, footY + 25}, Size = {56, labelH}
 		})
 		layout["router_style"] = {
 			PrettyName = "Router~Control Naming", Style = "Text", FontSize = fs,
@@ -162,12 +162,12 @@
 		-- Router binding -------------------------------------------------------
 		table.insert(graphics, {
 			Type = "GroupBox", Text = "Router Component", FontSize = fs, HTextAlign = "Left",
-			Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+			Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 			CornerRadius = 8, Position = {0, 34}, Size = {setupW, 92}
 		})
 		table.insert(graphics, {
 			Type = "Text", Text = "Router", FontSize = fs, HTextAlign = "Left",
-			Color = Palette.cti_navy, Position = {12, 59}, Size = {50, labelH}
+			Color = Palette.navy, Position = {12, 59}, Size = {50, labelH}
 		})
 		layout["router_select"] = {
 			PrettyName = "Router~Component", Style = "ComboBox", FontSize = fs,
@@ -195,7 +195,7 @@
 			Type = "GroupBox",
 			Text = SourceFirst and "Selection (source first)" or "Selection (destination first)",
 			FontSize = fs, HTextAlign = "Left",
-			Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+			Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 			CornerRadius = 8, Position = {0, 134}, Size = {setupW, 58}
 		})
 		if SourceFirst then
@@ -255,7 +255,7 @@
 		local sSetupH = rowDY + SourceCount * rowH + 10
 		table.insert(graphics, {
 			Type = "GroupBox", Text = "Sources", FontSize = fs, HTextAlign = "Left",
-			Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+			Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 			CornerRadius = 8, Position = {0, sSetupY}, Size = {setupW, sSetupH}
 		})
 		table.insert(graphics, {
@@ -270,7 +270,7 @@
 			local rowY = sSetupY + rowDY + (thisSource - 1) * rowH
 			table.insert(graphics, {
 				Type = "Text", Text = tostring(thisSource), FontSize = fs, HTextAlign = "Right",
-				Color = Palette.cti_navy, Position = {8, rowY + 3}, Size = {28, labelH}
+				Color = Palette.navy, Position = {8, rowY + 3}, Size = {28, labelH}
 			})
 			layout[fmt("source_name_%03d", thisSource)] = {
 				PrettyName = fmt("Sources~%d Name", thisSource),
@@ -291,7 +291,7 @@
 		local dSetupH = rowDY + DestCount * rowH + 10
 		table.insert(graphics, {
 			Type = "GroupBox", Text = "Destinations", FontSize = fs, HTextAlign = "Left",
-			Fill = Palette.White, StrokeColor = Palette.cti_navy, StrokeWidth = 1,
+			Fill = Palette.White, StrokeColor = Palette.navy, StrokeWidth = 1,
 			CornerRadius = 8, Position = {0, dSetupY}, Size = {setupW, dSetupH}
 		})
 		table.insert(graphics, {
@@ -310,7 +310,7 @@
 			local rowY = dSetupY + rowDY + (thisDest - 1) * rowH
 			table.insert(graphics, {
 				Type = "Text", Text = tostring(thisDest), FontSize = fs, HTextAlign = "Right",
-				Color = Palette.cti_navy, Position = {8, rowY + 3}, Size = {28, labelH}
+				Color = Palette.navy, Position = {8, rowY + 3}, Size = {28, labelH}
 			})
 			layout[fmt("dest_name_%03d", thisDest)] = {
 				PrettyName = fmt("Destinations~%d Name", thisDest),

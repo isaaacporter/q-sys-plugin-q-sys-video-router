@@ -1,8 +1,8 @@
--- CTI brand colour palette (see cti_brand_preferences.md)
+-- Colour palette
 Palette = {
-	cti_navy  = {13, 59, 102},   -- CTI Dark Blue  #0D3B66
-	cti_teal  = {0, 169, 165},   -- CTI Teal       #00A9A5
-	cti_amber = {255, 186, 73},  -- CTI Amber      #FFBA49
+	navy      = {13, 59, 102},   -- Dark Blue  #0D3B66
+	teal      = {0, 169, 165},   -- Teal       #00A9A5
+	amber     = {255, 186, 73},  -- Amber      #FFBA49
 	White     = {255, 255, 255},
 	Black     = {0, 0, 0},
 	Gray      = {128, 128, 128},

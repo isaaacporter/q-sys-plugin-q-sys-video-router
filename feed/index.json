@@ -1,0 +1,43 @@
+{
+  "@id": "https://raw.githubusercontent.com/isaaacporter/q-sys-plugin-q-sys-video-router/main/feed/index.json",
+  "@type": [
+    "catalog:CatalogRoot",
+    "PackageRegistration",
+    "catalog:Permalink"
+  ],
+  "count": 1,
+  "items": [
+    {
+      "@id": "https://raw.githubusercontent.com/isaaacporter/q-sys-plugin-q-sys-video-router/main/feed/index.json",
+      "lower": "1.2.1",
+      "upper": "1.2.1",
+      "count": 1,
+      "items": [
+        {
+          "@id": "https://raw.githubusercontent.com/isaaacporter/q-sys-plugin-q-sys-video-router/main/feed/1.2.1.json",
+          "packageContent": "https://raw.githubusercontent.com/isaaacporter/q-sys-plugin-q-sys-video-router/main/feed/QSYS-Video-Router.1.2.1.nupkg",
+          "catalogEntry": {
+            "@id": "https://raw.githubusercontent.com/isaaacporter/q-sys-plugin-q-sys-video-router/main/feed/1.2.1.json",
+            "authors": "Isaac Porter",
+            "copyright": "2026 Isaac Porter",
+            "dependencyGroups": [],
+            "description": "An operator front end for a Router, Router with Mixer, or MediaCast Router component in a Q-SYS design. Sources on the left, destinations on the right: pick a source, then the destinations to send it to, or route one source to every output. Names, per-entry visibility, and a routed-source readout for each destination. Installation via this personal package requires Q-SYS Designer 10.1 or later. Plugin version: 1.2.1.0.",
+            "iconUrl": "https://raw.githubusercontent.com/isaaacporter/q-sys-plugin-q-sys-video-router/main/package/icon.png",
+            "id": "QSYS-Video-Router",
+            "isPrerelease": false,
+            "language": "",
+            "licenseUrl": "",
+            "packageContent": "https://raw.githubusercontent.com/isaaacporter/q-sys-plugin-q-sys-video-router/main/feed/QSYS-Video-Router.1.2.1.nupkg",
+            "projectUrl": "https://github.com/isaaacporter/q-sys-plugin-q-sys-video-router",
+            "requireLicenseAcceptance": false,
+            "summary": "Source-to-destination routing panel for any Q-SYS router component.",
+            "tags": "Video Router Matrix",
+            "version": "1.2.1",
+            "releaseNotes": "Published as a Q-SYS Personal Package.",
+            "published": "2026-10-28T17:11:56Z"
+          }
+        }
+      ]
+    }
+  ]
+}
